@@ -71,16 +71,19 @@
                 sprites.add(SpriteFactory.create(layer, decor));
                 decor.setModified(true);
                 var bonus = decor.getBonus();
-                var hornet = decor.getBonus();
+                var hornet = decor.getHornet();
                 if (bonus != null) {
                     sprites.add(SpriteFactory.create(layer, bonus));
                     bonus.setModified(true);
+                }
+                if (hornet != null) {
+                    sprites.add(SpriteFactory.create(layer, hornet));
+                    hornet.setModified(true);
                 }
 
             }
 
             sprites.add(new SpriteGardener(layer, gardener));
-            //sprites.add(new SpiriteHornet(layer, new Hornet()));
         }
 
         void buildAndSetGameLoop() {

@@ -12,6 +12,8 @@ public abstract class Decor extends GameObject implements Walkable, Takeable {
 
     private Bonus bonus;
 
+    private  Hornet hornet;
+
     public Decor(Position position) {
         super(position);
     }
@@ -20,6 +22,11 @@ public abstract class Decor extends GameObject implements Walkable, Takeable {
         super(position);
         this.bonus = bonus;
     }
+    public Decor(Position position, Hornet hornet) {
+        super(position);
+        this.hornet=hornet;
+    }
+
 
     public Bonus getBonus() {
         return bonus;
@@ -37,6 +44,14 @@ public abstract class Decor extends GameObject implements Walkable, Takeable {
 
     public boolean walkableBy(Hornet hornet) {
         return hornet.canWalkOn(this);
+    }
+
+    public Hornet getHornet() {
+        return hornet;
+    }
+
+    public void setHornet(Hornet hornet) {
+        this.hornet = hornet;
     }
 
     @Override

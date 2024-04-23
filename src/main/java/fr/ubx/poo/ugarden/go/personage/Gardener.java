@@ -123,6 +123,7 @@ public class Gardener extends GameObject implements Movable, TakeVisitor, WalkVi
     }
 
     public void hurt(int damage) {
+        this.energy-=damage;
     }
 
     public int getNbPapple() {

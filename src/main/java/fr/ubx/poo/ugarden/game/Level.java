@@ -1,12 +1,11 @@
 package fr.ubx.poo.ugarden.game;
 
 import fr.ubx.poo.ugarden.go.bonus.*;
-import fr.ubx.poo.ugarden.go.decor.Decor;
-import fr.ubx.poo.ugarden.go.decor.Flowers;
-import fr.ubx.poo.ugarden.go.decor.Tree;
+import fr.ubx.poo.ugarden.go.decor.*;
 import fr.ubx.poo.ugarden.go.decor.ground.Carrots;
 import fr.ubx.poo.ugarden.go.decor.ground.Grass;
 import fr.ubx.poo.ugarden.go.decor.ground.Land;
+import fr.ubx.poo.ugarden.go.personage.Hornet;
 import fr.ubx.poo.ugarden.launcher.MapEntity;
 import fr.ubx.poo.ugarden.launcher.MapLevel;
 
@@ -77,18 +76,21 @@ public class Level implements Map {
                         decors.put(position, grass);
                         break;
                     }
-
+                    case Hornet:
+                        Decor hornet = new Grass(position);
+                        hornet.setHornet(new Hornet(game, position));
+                        decors.put(position, hornet);
+                        break;
 /*
                     case DoorNextClosed:
-                        decors.put(position, new (position));
+                        decors.put(position, new DoorNextClosed(position));
                         break;
                     case DoorNextOpened:
-                        decors.put(position, new Nest(position));
+                        decors.put(position, new DoorNextOpened(position));
                         break;
                     case DoorPrevOpened:
-                        decors.put(position, new Nest(position));
+                        decors.put(position, new DoorPrevOpened(position));
                         break;*/
-                    //case Gardener:
                     default:
                         throw new RuntimeException("EntityCode " + mapEntity.name() + " not processed");
                 }
