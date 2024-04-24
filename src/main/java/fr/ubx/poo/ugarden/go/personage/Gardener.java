@@ -16,12 +16,9 @@ import fr.ubx.poo.ugarden.go.bonus.*;
 import fr.ubx.poo.ugarden.go.decor.*;
 import fr.ubx.poo.ugarden.go.decor.ground.Carrots;
 import fr.ubx.poo.ugarden.go.decor.ground.Land;
-import javafx.animation.KeyFrame;
-import javafx.animation.Timeline;
+
 import javafx.scene.paint.Color;
 import javafx.util.Duration;
-
-import java.util.concurrent.atomic.AtomicInteger;
 
 
 public class Gardener extends GameObject implements Movable, TakeVisitor, WalkVisitor {
@@ -61,28 +58,19 @@ public class Gardener extends GameObject implements Movable, TakeVisitor, WalkVi
     public void take(Apple apple) {
 
         energy += game.configuration().energyBoost();
-
+        if (energy>100){
+            energy=100;
+        }
         System.out.println("I am taking the Apple, i feel better");
 
     }
     public void take(Hedgehog hedgehog) {
         this.hedgehog+=1;
         System.out.println("oh hedgehog");
-
     }
     //TODO
     public void take(PoisonedApple PoisonnedAPpple) {
         this.nbPapple+=1;
-        int disD =  game.configuration().diseaseDuration();
-        AtomicInteger sec = new AtomicInteger(0);
-        Timeline disDur = new Timeline(new KeyFrame(Duration.seconds(1), event -> {
-            sec.getAndIncrement();
-
-
-        }));
-
-        disDur.setCycleCount(disD);
-        disDur.play();
         System.out.println("oops poisonnedApple ...");
 
     }

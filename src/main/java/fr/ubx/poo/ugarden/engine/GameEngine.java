@@ -107,7 +107,8 @@
                     statusBar.update(game);
                 }
             };
-        }
+
+            }
 
 
         private void checkLevel() {
@@ -179,12 +180,11 @@
                 showMessage("Perdu!", Color.RED);
             }
             if(gardener.getHedgehog()==1){
-                gameLoop.stop();
-                showMessage("gagne",Color.GREEN);
+                win();
             }
         }
 
-        public void win(){
+        public void win(){//j'avais pas vu qu'il y avait deja cette fonction
             gameLoop.stop();
             showMessage("Gagne!", Color.GREEN);
         }
