@@ -167,6 +167,10 @@
                 gameLoop.stop();
                 showMessage("Perdu!", Color.RED);
             }
+            if(gardener.getHedgehog()==1){
+                gameLoop.stop();
+                showMessage("gagne",Color.GREEN);
+            }
         }
 
         public void win(){

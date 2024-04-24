@@ -21,13 +21,13 @@ public class Hornet extends GameObject implements Movable, TakeVisitor, WalkVisi
     public Direction getDirection(){
         return direction;
     }
-    /*public void requestMove(Direction direction) {
+    public void requestMove(Direction direction) {
         if (direction != this.direction) {
             this.direction = direction;
             setModified(true);
         }
         moveRequested = true;
-    }*/
+    }
     public final boolean canMove(Direction direction) {
         Position nextPos = direction.nextPosition(getPosition());
         return (((-1< nextPos.x())&&(nextPos.x() < game.world().getGrid().width())) &&
@@ -42,8 +42,9 @@ public class Hornet extends GameObject implements Movable, TakeVisitor, WalkVisi
         Position nextPos= next.getPosition();
         setPosition(nextPos);
     }
-/*
+
     public void update(long now) {
+        direction=Direction.random();
         if (moveRequested) {
             if (canMove(direction)) {
                 doMove(direction);
@@ -52,11 +53,4 @@ public class Hornet extends GameObject implements Movable, TakeVisitor, WalkVisi
         }
         moveRequested = false;
     }
-
-    public void doMove(Direction direction) {
-        // Restart the timer
-        Position nextPos = direction.nextPosition(getPosition());
-        Decor next = game.world().getGrid().get(nextPos);
-        Decor here=game.world().getGrid().get(getPosition());
-        setPosition(nextPos);}*/
 }
