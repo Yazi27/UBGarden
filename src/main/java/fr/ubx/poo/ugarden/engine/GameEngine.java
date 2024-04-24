@@ -31,6 +31,8 @@
         private final Gardener gardener;
         private final List<Sprite> sprites = new LinkedList<>();
         private final Set<Sprite> cleanUpSprites = new HashSet<>();
+
+        private final List<Hornet> hornets=new ArrayList<>();
         private final Stage stage;
         private final Pane layer = new Pane();
         private StatusBar statusBar;
@@ -79,6 +81,7 @@
                 if (hornet != null) {
                     sprites.add(SpriteFactory.create(layer, hornet));
                     hornet.setModified(true);
+                    hornets.add(hornet);
                 }
 
             }
@@ -120,8 +123,16 @@
         }
 
         private void checkCollision() {
-            // Check a collision between a hornet and the gardener
-        }
+
+            for (int i = 0; i < hornets.size(); i++) {
+                Hornet frelon = hornets.get(i);
+                if (frelon.getPosition().equals(gardener.getPosition())){
+                    gardener.hurt(20);
+                    frelon.remove();
+                    hornets.remove(i);
+                }
+            }
+            }
 
         private void processInput() {
             if (input.isExit()) {
