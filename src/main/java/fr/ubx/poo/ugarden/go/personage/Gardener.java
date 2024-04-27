@@ -33,6 +33,7 @@ public class Gardener extends GameObject implements Movable, TakeVisitor, WalkVi
     private boolean takenAppleRequested = false;
     private Timer recoveryTimer;
     private Timer diseaseTimer;
+    private int inscticide;
     public Gardener(Game game, Position position) {
 
         super(game, position);
@@ -43,6 +44,7 @@ public class Gardener extends GameObject implements Movable, TakeVisitor, WalkVi
         this.hedgehog=0;
         this.recoveryTimer = new Timer(game.configuration().energyRecoverDuration());
         this.diseaseTimer = new Timer (game.configuration().diseaseDuration());
+        this.inscticide=0;
     }
 
     public void startRecoveryTimer(long now) {
@@ -56,6 +58,7 @@ public class Gardener extends GameObject implements Movable, TakeVisitor, WalkVi
     public int getKey() {
         return key;
     }
+
 
     @Override
     public void take(Key key) {
@@ -90,6 +93,7 @@ public class Gardener extends GameObject implements Movable, TakeVisitor, WalkVi
 
     public void take(Insecticide insecticide){
         System.out.println("de quoi tuer un frelon");
+        this.inscticide+=1;
     }
 
 
@@ -181,7 +185,11 @@ public class Gardener extends GameObject implements Movable, TakeVisitor, WalkVi
     }
 
     public void hurt(int damage) {
-        this.energy-=damage;
+        if(this.inscticide>0){
+            this.inscticide-=1;
+        }
+        else
+            this.energy-=damage;
     }
 
     public int getDiseaseLevel() {

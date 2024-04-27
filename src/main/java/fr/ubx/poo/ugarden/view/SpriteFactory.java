@@ -5,12 +5,8 @@
 package fr.ubx.poo.ugarden.view;
 
 import fr.ubx.poo.ugarden.go.GameObject;
-import fr.ubx.poo.ugarden.go.bonus.Apple;
-import fr.ubx.poo.ugarden.go.bonus.Hedgehog;
-import fr.ubx.poo.ugarden.go.bonus.Key;
-import fr.ubx.poo.ugarden.go.bonus.PoisonedApple;
+import fr.ubx.poo.ugarden.go.bonus.*;
 import fr.ubx.poo.ugarden.go.decor.Flowers;
-import fr.ubx.poo.ugarden.go.bonus.Nest;
 import fr.ubx.poo.ugarden.go.decor.Tree;
 import fr.ubx.poo.ugarden.go.decor.ground.Carrots;
 import fr.ubx.poo.ugarden.go.decor.ground.Grass;
@@ -47,6 +43,8 @@ public final class SpriteFactory {
             return new Sprite(layer, factory.get(KEY), gameObject);
         if (gameObject instanceof Hornet)
             return new Sprite(layer, factory.get(HORNET_DOWN), gameObject);
+        if (gameObject instanceof Insecticide)
+            return new Sprite(layer,factory.get(INSECTICIDE),gameObject);
         throw new RuntimeException("Unsupported sprite for decor " + gameObject);
     }
 }

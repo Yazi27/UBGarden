@@ -9,7 +9,8 @@ public class Insecticide extends Bonus{
         super(position, decor);
     }
     @Override
-    public void takenBy(Gardener gardener) {gardener.take(this);
+    public void takenBy(Gardener gardener) {
+        gardener.take(this);
         remove();
     }
 }

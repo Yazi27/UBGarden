@@ -76,12 +76,19 @@ public class Level implements Map {
                         decors.put(position, grass);
                         break;
                     }
-                    case Hornet:
+                    case Hornet: {
                         Decor hornet = new Grass(position);
                         hornet.setHornet(new Hornet(game, position));
                         decors.put(position, hornet);
                         break;
-/*
+                    }
+                    case Insecticide:{
+                        Decor grass = new Grass(position);
+                        grass.setBonus(new Insecticide(position, grass));
+                        decors.put(position, grass);
+                        break;}
+
+                        /*
                     case DoorNextClosed:
                         decors.put(position, new DoorNextClosed(position));
                         break;
