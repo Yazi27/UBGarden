@@ -108,7 +108,7 @@
                     render();
                     statusBar.update(game);
 
-
+                    // Gardener logic
                 }
             };
 
@@ -136,17 +136,6 @@
                     frelon.remove();
                     hornets.remove(i);
                 }
-            }
-            }
-        private void mvhornet(long now) {
-            this.hornetmovefrequency.update(now);
-            if (!this.hornetmovefrequency.isRunning()) {
-                for (int i = 0; i < hornets.size(); i++) {
-                    Hornet frelon = hornets.get(i);
-                    frelon.requestMove(Direction.random());
-                    frelon.update(now);
-                }
-                this.hornetmovefrequency.start(now);
             }
         }
         private void processInput() {
@@ -188,6 +177,10 @@
             game.world().getGrid().values().forEach(decor -> decor.update(now));
 
             gardener.update(now);
+
+            for (Hornet hornet : hornets) {
+                hornet.update(now);
+            }
 
             if (gardener.getEnergy() < 0) {
                 gameLoop.stop();

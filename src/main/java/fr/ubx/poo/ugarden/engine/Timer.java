@@ -38,7 +38,6 @@ public class Timer {
         if (!running)
             requested = true;
         else {
-
             this.remaining = duration;
             startTime = now;
         }

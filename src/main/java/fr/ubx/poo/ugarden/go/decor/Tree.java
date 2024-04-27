@@ -5,8 +5,7 @@
 package fr.ubx.poo.ugarden.go.decor;
 
 import fr.ubx.poo.ugarden.game.Position;
-import fr.ubx.poo.ugarden.go.personage.Gardener;
-
+import fr.ubx.poo.ugarden.go.personage.*;
 public class Tree extends Decor {
     public Tree(Position position) {
         super(position);
@@ -15,5 +14,9 @@ public class Tree extends Decor {
     @Override
     public boolean walkableBy(Gardener gardener) {
         return gardener.canWalkOn(this);
+    }
+    @Override
+    public boolean walkableBy(Hornet hornet) {
+        return hornet.canWalkOn(this);
     }
 }

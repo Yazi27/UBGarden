@@ -30,8 +30,8 @@ public class Gardener extends GameObject implements Movable, TakeVisitor, WalkVi
     private int hedgehog;
     private Direction direction;
     private boolean moveRequested = false;
+    private boolean takenAppleRequested = false;
     private Timer recoveryTimer;
-
     private Timer diseaseTimer;
     public Gardener(Game game, Position position) {
 
@@ -43,6 +43,10 @@ public class Gardener extends GameObject implements Movable, TakeVisitor, WalkVi
         this.hedgehog=0;
         this.recoveryTimer = new Timer(game.configuration().energyRecoverDuration());
         this.diseaseTimer = new Timer (game.configuration().diseaseDuration());
+    }
+
+    public void startRecoveryTimer(long now) {
+        recoveryTimer.start(now);
     }
 
     public int getHedgehog() {
@@ -77,8 +81,8 @@ public class Gardener extends GameObject implements Movable, TakeVisitor, WalkVi
     public void take(PoisonedApple poisonedApple) {
         System.out.println(" Picked up a poisoned apple ...");
 
-        // Start the poisoned apple timer
-        //diseaseTimer.start(now);
+        // Start apple timer on update
+        takenAppleRequested = true;
 
         // Increment the disease level
         this.diseaseLevel++;
@@ -105,13 +109,14 @@ public class Gardener extends GameObject implements Movable, TakeVisitor, WalkVi
 @Override
     public final boolean canMove(Direction direction) {
         Position nextPos = direction.nextPosition(getPosition());
-        return (
+        boolean can =
                 ((-1< nextPos.x())&&(nextPos.x() < game.world().getGrid().width())
                 ) &&
                 ((-1< nextPos.y())&& (nextPos.y() < game.world().getGrid().height())
                 ) &&
-                (game.world().getGrid().get(nextPos).walkableBy(this))
-        );
+                (game.world().getGrid().get(nextPos).walkableBy(this));
+        System.out.println(can);
+        return can;
     }
 
     @Override
@@ -123,22 +128,12 @@ public class Gardener extends GameObject implements Movable, TakeVisitor, WalkVi
         Decor next = game.world().getGrid().get(nextPos);
         Decor here = game.world().getGrid().get(getPosition());
 
-        GameObject nextObject = game.world().getGrid().get(nextPos);
-
         setPosition(nextPos);
 
         if (next != null)
             next.takenBy(this);
 
-        if (here instanceof Land){
-            this.energy-=2 * diseaseLevel;
-        }
-        else if (here instanceof Carrots){
-            this.energy-=3 * diseaseLevel;
-        }
-        else {
-            this.energy-= diseaseLevel;
-        }
+        this.energy -= here.energyConsumptionWalk() * this.diseaseLevel;
 
     }
     private void recoverEnergy() {
@@ -155,6 +150,11 @@ public class Gardener extends GameObject implements Movable, TakeVisitor, WalkVi
                 doMove(direction);
 
             }
+
+        } else if (takenAppleRequested) {
+            this.diseaseTimer.start(now);
+            takenAppleRequested = false;
+
         } else {
             recoveryTimer.update(now); // Update the recovery timer
             diseaseTimer.update(now);

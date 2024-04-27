@@ -13,13 +13,6 @@ public class Grass extends Ground {
         super(position);
     }
 
-    @Override
-    public void takenBy(Gardener gardener) {
-        Bonus bonus = getBonus();
-        if (bonus != null) {
-            bonus.takenBy(gardener);
-        }
-    }
 
     @Override
     public int energyConsumptionWalk() {

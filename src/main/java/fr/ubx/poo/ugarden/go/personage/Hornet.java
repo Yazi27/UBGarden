@@ -8,15 +8,17 @@ import fr.ubx.poo.ugarden.go.Movable;
 import fr.ubx.poo.ugarden.go.TakeVisitor;
 import fr.ubx.poo.ugarden.go.WalkVisitor;
 import fr.ubx.poo.ugarden.go.decor.Decor;
-
+import fr.ubx.poo.ugarden.engine.Timer;
 
 public class Hornet extends GameObject implements Movable, TakeVisitor, WalkVisitor {
     private Direction direction;
     private boolean moveRequested = false;
+    private Timer moveTimer;
 
     public Hornet(Game game, Position position) {
         super(game, position);
         this.direction=Direction.LEFT;
+        this.moveTimer = new Timer(game.configuration().hornetMoveFrequency());
     }
     public Direction getDirection(){
         return direction;
@@ -30,6 +32,7 @@ public class Hornet extends GameObject implements Movable, TakeVisitor, WalkVisi
     }
     public final boolean canMove(Direction direction) {
         Position nextPos = direction.nextPosition(getPosition());
+
         return (((-1< nextPos.x())&&(nextPos.x() < game.world().getGrid().width())) &&
                 ((-1< nextPos.y())&& (nextPos.y() < game.world().getGrid().height()))&&
                 (game.world().getGrid().get(nextPos).walkableBy(this)));
@@ -37,16 +40,33 @@ public class Hornet extends GameObject implements Movable, TakeVisitor, WalkVisi
 
     @Override
     public void doMove(Direction direction) {
-        this.direction=direction;
-        Decor next=game.world().getGrid().get(getPosition());
-        Position nextPos= next.getPosition();
+        Position nextPos = direction.nextPosition(getPosition());
         setPosition(nextPos);
+
+        moveRequested = false;
     }
 
     public void update(long now) {
+        moveTimer.update(now);
+        // Si on veux bouger
         if (moveRequested) {
-            if (canMove(direction))
+            if (canMove(direction)) {
+                System.out.println("Hornet can move and will move");
+
                 doMove(direction);
+
+                // Et on restart timer
+                moveTimer.start(now);
+            } else {
+                moveRequested = false;
+            }
+            // Si on pas bougé
+        } else {
+            if (!moveTimer.isRunning()) {
+                requestMove(Direction.random());
+                System.out.println("Requested random move for hornet");
+            }
         }
+
     }
 }
