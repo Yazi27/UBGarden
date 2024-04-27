@@ -44,13 +44,9 @@ public class Hornet extends GameObject implements Movable, TakeVisitor, WalkVisi
     }
 
     public void update(long now) {
-        direction=Direction.random();
         if (moveRequested) {
-            if (canMove(direction)) {
+            if (canMove(direction))
                 doMove(direction);
-
-            }
         }
-        moveRequested = false;
     }
 }

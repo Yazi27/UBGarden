@@ -31,17 +31,19 @@
         private final Gardener gardener;
         private final List<Sprite> sprites = new LinkedList<>();
         private final Set<Sprite> cleanUpSprites = new HashSet<>();
-
         private final List<Hornet> hornets=new ArrayList<>();
         private final Stage stage;
         private final Pane layer = new Pane();
         private StatusBar statusBar;
         private Input input;
+        private Timer hornetmovefrequency;
+
 
         public GameEngine(Game game, final Stage stage) {
             this.stage = stage;
             this.game = game;
             this.gardener = game.getGardener();
+            this.hornetmovefrequency =new Timer(game.configuration().hornetMoveFrequency());
             initialize();
             buildAndSetGameLoop();
         }
@@ -100,15 +102,17 @@
                     // Do actions
                     update(now);
                     checkCollision();
-
+                    gardener.update(now);
                     // Graphic update
                     cleanupSprites();
                     render();
                     statusBar.update(game);
+
+
                 }
             };
 
-            }
+        }
 
 
         private void checkLevel() {
@@ -134,7 +138,17 @@
                 }
             }
             }
-
+        private void mvhornet(long now) {
+            this.hornetmovefrequency.update(now);
+            if (!this.hornetmovefrequency.isRunning()) {
+                for (int i = 0; i < hornets.size(); i++) {
+                    Hornet frelon = hornets.get(i);
+                    frelon.requestMove(Direction.random());
+                    frelon.update(now);
+                }
+                this.hornetmovefrequency.start(now);
+            }
+        }
         private void processInput() {
             if (input.isExit()) {
                 gameLoop.stop();

@@ -4,6 +4,7 @@
 
 package fr.ubx.poo.ugarden.go.personage;
 
+import fr.ubx.poo.ugarden.engine.Timer;
 import fr.ubx.poo.ugarden.game.Direction;
 import fr.ubx.poo.ugarden.game.Game;
 import fr.ubx.poo.ugarden.game.Position;
@@ -24,20 +25,24 @@ import javafx.util.Duration;
 public class Gardener extends GameObject implements Movable, TakeVisitor, WalkVisitor {
 
     private int energy;
-    private int nbPapple;
+    private int diseaseLevel;
     private int key;
     private int hedgehog;
     private Direction direction;
     private boolean moveRequested = false;
+    private Timer recoveryTimer;
 
+    private Timer diseaseTimer;
     public Gardener(Game game, Position position) {
 
         super(game, position);
         this.direction = Direction.DOWN;
         this.energy = game.configuration().gardenerEnergy();
-        this.nbPapple=0;
+        this.diseaseLevel=1;
         this.key=0;
         this.hedgehog=0;
+        this.recoveryTimer = new Timer(game.configuration().energyRecoverDuration());
+        this.diseaseTimer = new Timer (game.configuration().diseaseDuration());
     }
 
     public int getHedgehog() {
@@ -69,10 +74,14 @@ public class Gardener extends GameObject implements Movable, TakeVisitor, WalkVi
         System.out.println("oh hedgehog");
     }
     //TODO
-    public void take(PoisonedApple PoisonnedAPpple) {
-        this.nbPapple+=1;
-        System.out.println("oops poisonnedApple ...");
+    public void take(PoisonedApple poisonedApple) {
+        System.out.println(" Picked up a poisoned apple ...");
 
+        // Start the poisoned apple timer
+        //diseaseTimer.start(now);
+
+        // Increment the disease level
+        this.diseaseLevel++;
     }
 
     public void take(Insecticide insecticide){
@@ -96,53 +105,87 @@ public class Gardener extends GameObject implements Movable, TakeVisitor, WalkVi
 @Override
     public final boolean canMove(Direction direction) {
         Position nextPos = direction.nextPosition(getPosition());
-        return (((-1< nextPos.x())&&(nextPos.x() < game.world().getGrid().width())) &&
-                ((-1< nextPos.y())&& (nextPos.y() < game.world().getGrid().height()))&&
-                (game.world().getGrid().get(nextPos).walkableBy(this)));
+        return (
+                ((-1< nextPos.x())&&(nextPos.x() < game.world().getGrid().width())
+                ) &&
+                ((-1< nextPos.y())&& (nextPos.y() < game.world().getGrid().height())
+                ) &&
+                (game.world().getGrid().get(nextPos).walkableBy(this))
+        );
     }
 
     @Override
     public void doMove(Direction direction) {
-        // Restart the timer
+
+
         Position nextPos = direction.nextPosition(getPosition());
+
         Decor next = game.world().getGrid().get(nextPos);
-        Decor here=game.world().getGrid().get(getPosition());
+        Decor here = game.world().getGrid().get(getPosition());
+
+        GameObject nextObject = game.world().getGrid().get(nextPos);
+
         setPosition(nextPos);
+
         if (next != null)
             next.takenBy(this);
+
         if (here instanceof Land){
-            this.energy-=2;
+            this.energy-=2 * diseaseLevel;
         }
         else if (here instanceof Carrots){
-            this.energy-=3;
+            this.energy-=3 * diseaseLevel;
         }
         else {
-            this.energy-=1;
+            this.energy-= diseaseLevel;
         }
 
-
     }
-
+    private void recoverEnergy() {
+        if (energy < game.configuration().gardenerEnergy()) {
+            energy++;
+        }
+    }
 
     public void update(long now) {
         if (moveRequested) {
             if (canMove(direction)) {
+                // Restart timer
+                this.recoveryTimer.start(now);
                 doMove(direction);
 
             }
-        }
-       /* else {        this.energy+=1; ca cree une regeneration illimite
+        } else {
+            recoveryTimer.update(now); // Update the recovery timer
+            diseaseTimer.update(now);
 
-        }*/
+            if (!recoveryTimer.isRunning()) {
+                // If the recovery timer has finished, recover energy
+                recoverEnergy();
+                recoveryTimer.start(now); // Restart the recovery timer
+            }
+
+            // Check if the poisoned apple timer has finished
+            if (!diseaseTimer.isRunning() && diseaseLevel > 1) {
+                // Decrement the disease level
+                this.diseaseLevel--;
+
+                // Restart the poisoned apple timer if there are still poisoned apples
+                if (diseaseLevel > 1) {
+                    diseaseTimer.start(now);
+                }
+            }
+        }
         moveRequested = false;
+
     }
 
     public void hurt(int damage) {
         this.energy-=damage;
     }
 
-    public int getNbPapple() {
-        return nbPapple;
+    public int getDiseaseLevel() {
+        return diseaseLevel;
     }
 
     public void hurt() {

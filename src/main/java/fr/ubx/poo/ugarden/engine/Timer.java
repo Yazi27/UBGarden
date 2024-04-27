@@ -34,11 +34,14 @@ public class Timer {
     }
 
     // Start the timer
-    public void start() {
+    public void start(long now) {
         if (!running)
             requested = true;
-        else
-            remaining = duration;
+        else {
+
+            this.remaining = duration;
+            startTime = now;
+        }
     }
 
     // Check if the timer is still running
