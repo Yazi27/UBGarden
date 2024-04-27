@@ -7,6 +7,7 @@ import fr.ubx.poo.ugarden.game.Direction;
 import fr.ubx.poo.ugarden.go.Movable;
 import fr.ubx.poo.ugarden.go.TakeVisitor;
 import fr.ubx.poo.ugarden.go.WalkVisitor;
+import fr.ubx.poo.ugarden.go.bonus.Insecticide;
 import fr.ubx.poo.ugarden.go.decor.Decor;
 import fr.ubx.poo.ugarden.engine.Timer;
 
@@ -14,12 +15,19 @@ public class Hornet extends GameObject implements Movable, TakeVisitor, WalkVisi
     private Direction direction;
     private boolean moveRequested = false;
     private Timer moveTimer;
+    private int insecticide;
 
     public Hornet(Game game, Position position) {
         super(game, position);
         this.direction=Direction.LEFT;
         this.moveTimer = new Timer(game.configuration().hornetMoveFrequency());
+        this.insecticide=0;
     }
+
+    public int getInsecticide() {
+        return insecticide;
+    }
+
     public Direction getDirection(){
         return direction;
     }
@@ -42,6 +50,9 @@ public class Hornet extends GameObject implements Movable, TakeVisitor, WalkVisi
     public void doMove(Direction direction) {
         Position nextPos = direction.nextPosition(getPosition());
         setPosition(nextPos);
+        Decor here = game.world().getGrid().get(getPosition());
+        if (here != null)
+            here.takenBy(this);
 
         moveRequested = false;
     }
@@ -68,5 +79,8 @@ public class Hornet extends GameObject implements Movable, TakeVisitor, WalkVisi
             }
         }
 
+    }
+    public void take(Insecticide insecticide){
+        this.insecticide+=1;
     }
 }

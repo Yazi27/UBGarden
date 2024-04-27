@@ -96,7 +96,9 @@ public class Gardener extends GameObject implements Movable, TakeVisitor, WalkVi
         this.inscticide+=1;
     }
 
-
+    public int getInscticide() {
+        return inscticide;
+    }
 
     public int getEnergy() {
         return this.energy;

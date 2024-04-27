@@ -180,6 +180,8 @@
 
             for (Hornet hornet : hornets) {
                 hornet.update(now);
+                if (hornet.getInsecticide()==1)
+                    hornet.remove();
             }
 
             if (gardener.getEnergy() < 0) {

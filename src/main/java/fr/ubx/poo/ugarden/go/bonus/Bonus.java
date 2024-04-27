@@ -8,6 +8,7 @@ import fr.ubx.poo.ugarden.game.Position;
 import fr.ubx.poo.ugarden.go.GameObject;
 import fr.ubx.poo.ugarden.go.Takeable;
 import fr.ubx.poo.ugarden.go.decor.Decor;
+import fr.ubx.poo.ugarden.go.personage.Hornet;
 
 public abstract class Bonus extends GameObject implements Takeable {
 
@@ -24,4 +25,6 @@ public abstract class Bonus extends GameObject implements Takeable {
         decor.setBonus(null);
     }
 
+    public void takenBy(Hornet hornet) {
+    }
 }
