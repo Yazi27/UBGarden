@@ -11,6 +11,9 @@
     import fr.ubx.poo.ugarden.go.bonus.Insecticide;
     import fr.ubx.poo.ugarden.go.bonus.Nest;
     import fr.ubx.poo.ugarden.go.decor.Decor;
+    import fr.ubx.poo.ugarden.go.decor.DoorNextClosed;
+    import fr.ubx.poo.ugarden.go.decor.DoorNextOpened;
+    import fr.ubx.poo.ugarden.go.decor.DoorPrevOpened;
     import fr.ubx.poo.ugarden.go.decor.ground.Grass;
     import fr.ubx.poo.ugarden.go.decor.ground.Land;
     import fr.ubx.poo.ugarden.go.personage.Gardener;
@@ -45,11 +48,9 @@
         private StatusBar statusBar;
         private Input input;
         private final Timer nestTimer;
-        private Position nestPosition;
+        private final List<Position> nestPositions = new ArrayList<>();
         private Insecticide lastInsecticide;
         private static final Random randomGenerator = new Random();
-
-
 
         public GameEngine(Game game, final Stage stage) {
             this.stage = stage;
@@ -61,6 +62,7 @@
         }
 
         private void initialize() {
+
             Group root = new Group();
 
             int height = game.world().getGrid().height();
@@ -80,9 +82,6 @@
             root.getChildren().add(layer);
             statusBar = new StatusBar(root, sceneWidth, sceneHeight);
 
-            // Create sprites
-            int currentLevel = game.world().currentLevel();
-
             for (var decor : game.world().getGrid().values()) {
                 sprites.add(SpriteFactory.create(layer, decor));
                 decor.setModified(true);
@@ -94,12 +93,11 @@
 
                     // Check if we found the Nest
                     if (bonus instanceof Nest) {
-
-                        // If we did, then save the Nest Position
-                        this.nestPosition = bonus.getPosition();
-
+                        // If we found a Nest, add its position to the list
+                        nestPositions.add(bonus.getPosition());
+                        spawnHornet(bonus.getPosition());
                         System.out.println("Found Nest position at");
-                        System.out.println(this.nestPosition);
+                        System.out.println(bonus.getPosition());
                     }
                 }
             }
@@ -110,6 +108,11 @@
         void buildAndSetGameLoop() {
             gameLoop = new AnimationTimer() {
                 public void handle(long now) {
+
+                    // If changing levels, reset timer
+                    if (game.isSwitchLevelRequested()) {
+                        nestTimer.start(now);
+                    }
                     checkLevel();
 
                     // Check keyboard actions
@@ -124,7 +127,6 @@
                     render();
                     statusBar.update(game);
 
-                    // Gardener logic
                 }
             };
 
@@ -133,13 +135,67 @@
 
         private void checkLevel() {
             if (game.isSwitchLevelRequested()) {
-                // Find the new level to switch to
-                // clear all sprites
-                // change the current level
-                // Find the position of the door to reach
-                // Set the position of the gardener
-                //stage.close();
-                //initialize();
+                int requestedLevel = game.getSwitchLevel();
+
+                // Switching from level X to level Y
+                System.out.println("Switching from level " + game.world().currentLevel() + " to level " + requestedLevel);
+                // Clear all sprites
+                sprites.clear();
+                layer.getChildren().clear();
+
+                // Old requested level
+                int oldRequestedLevel = game.world().currentLevel();
+
+                // Change the current level
+                game.world().setCurrentLevel(requestedLevel);
+
+                // Find the position of the door to reach in the requested level
+                Position doorPosition = null;
+                for (var decor : game.world().getGrid().values()) {
+
+                    // Print position and class of decor
+                    System.out.println("Position: " + decor.getPosition());
+                    System.out.println("Class: " + decor.getClass());
+                    if (game.world().currentLevel() < oldRequestedLevel) {
+                        // Going back to the previous level
+                        System.out.println("Checking for previous level door");
+                        if (decor instanceof DoorNextOpened) {
+                            System.out.println("Going back to the previous level");
+                            doorPosition = decor.getPosition();
+                            System.out.println("Found door position at");
+                            System.out.println(doorPosition);
+                            break;
+                        }
+                    } else {
+                        // Going to the next level
+                        if (decor instanceof DoorPrevOpened) {
+                            System.out.println("Going to the next level");
+                            doorPosition = decor.getPosition();
+                            System.out.println("Found door position at");
+                            System.out.println(doorPosition);
+                            break;
+                        }
+                    }
+                }
+
+                // Clear hornets list
+                hornets.clear();
+
+                nestPositions.clear();
+
+                // Clear the last insecticide
+                lastInsecticide = null;
+
+                // Set the position of the gardener to the door position
+                if (doorPosition != null) {
+                    gardener.setPosition(doorPosition);
+                }
+
+                // Clear the switch level request
+                game.clearSwitchLevel();
+
+                // Reinitialize the game engine for the requested level
+                initialize();
             }
         }
 
@@ -189,6 +245,13 @@
             }.start();
         }
 
+        // Spawn hornet at given location
+        public void spawnHornet(Position position) {
+            Hornet hornet = new Hornet(game, position);
+            sprites.add(SpriteFactory.create(layer, hornet));
+            hornets.add(hornet);
+        }
+
         private Position generateValidPosition() {
             int x, y;
             Position position;
@@ -202,6 +265,15 @@
             } while (!(decorAtPosition instanceof Grass) || decorAtPosition.getBonus() != null);
 
             return position;
+        }
+
+        public boolean isPositionOccupiedByHornet(Position position) {
+            for (Hornet hornet : hornets) {
+                if (hornet.getPosition().equals(position)) {
+                    return true;
+                }
+            }
+            return false;
         }
 
         private void update(long now) {
@@ -224,14 +296,14 @@
                 showMessage("Perdu!", Color.RED);
             }
 
-            // Check if we should spawn an insecticide and a hornet
+            // Check if we should spawn hornets and an insecticide
             if (!nestTimer.isRunning()) {
-                // Spawn Hornet at nest Location
-                Hornet hornet = new Hornet(game, nestPosition);
-                sprites.add(SpriteFactory.create(layer, hornet));
-                hornets.add(hornet);
+                // Spawn a Hornet at each Nest position
+                for (Position nestPosition : nestPositions) {
+                    spawnHornet(nestPosition);
+                }
 
-                // Remove last insecticide from the map if its present
+                // Remove last insecticide from the map if it's present
                 if (lastInsecticide != null) {
                     Decor lastInsecticideDecor = game.world().getGrid().get(lastInsecticide.getPosition());
                     // Make sure we don't remove another bonus
@@ -272,6 +344,7 @@
 
             if(gardener.getHedgehog()==1){
                 win();
+                System.out.println("MERCI D'AVOIR JOUÉ");
             }
         }
 

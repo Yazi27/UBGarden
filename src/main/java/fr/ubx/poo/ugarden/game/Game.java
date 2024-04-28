@@ -16,6 +16,14 @@ public class Game {
         this.world = world;
         gardener = new Gardener(this, gardenerPosition);
     }
+    public GameEngine getEngine() {
+        return gameEngine;
+    }
+
+    // Used in GameLauncherView to then further be used by Hornet to know where another Hornet is at
+    public void setGameEngine(GameEngine gameEngine) {
+        this.gameEngine = gameEngine;
+    }
 
     public Configuration configuration() {
         return configuration;

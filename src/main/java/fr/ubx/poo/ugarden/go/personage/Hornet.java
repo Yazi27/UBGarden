@@ -41,9 +41,24 @@ public class Hornet extends GameObject implements Movable, TakeVisitor, WalkVisi
     public final boolean canMove(Direction direction) {
         Position nextPos = direction.nextPosition(getPosition());
 
-        return (((-1< nextPos.x())&&(nextPos.x() < game.world().getGrid().width())) &&
-                ((-1< nextPos.y())&& (nextPos.y() < game.world().getGrid().height()))&&
-                (game.world().getGrid().get(nextPos).walkableBy(this)));
+        // Check if the next position is within the grid bounds
+        if (nextPos.x() < 0 || nextPos.x() >= game.world().getGrid().width() ||
+                nextPos.y() < 0 || nextPos.y() >= game.world().getGrid().height()) {
+            return false;
+        }
+
+        // Check if the decor at the next position is walkable by the hornet
+        Decor decor = game.world().getGrid().get(nextPos);
+        if (decor == null || !decor.walkableBy(this)) {
+            return false;
+        }
+
+        // Check if the next position is occupied by another hornet
+        if (game.getEngine().isPositionOccupiedByHornet(nextPos)) {
+            return false;
+        }
+
+        return true;
     }
 
     @Override

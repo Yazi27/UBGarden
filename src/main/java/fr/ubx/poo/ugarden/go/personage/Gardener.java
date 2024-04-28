@@ -47,10 +47,6 @@ public class Gardener extends GameObject implements Movable, TakeVisitor, WalkVi
         this.insecticide=0;
     }
 
-    public void startRecoveryTimer(long now) {
-        recoveryTimer.start(now);
-    }
-
     public int getHedgehog() {
         return hedgehog;
     }
@@ -59,14 +55,12 @@ public class Gardener extends GameObject implements Movable, TakeVisitor, WalkVi
         return key;
     }
 
-
     @Override
     public void take(Key key) {
-// TODO
-        this.key+=1;
+        this.key += 1;
         System.out.println("I am taking the key, I should do something ...");
 
-    }// TODO
+    }
     public void take(Apple apple) {
 
         energy += game.configuration().energyBoost();
@@ -132,6 +126,25 @@ public class Gardener extends GameObject implements Movable, TakeVisitor, WalkVi
         Decor here = game.world().getGrid().get(getPosition());
 
         setPosition(nextPos);
+
+        if (next instanceof DoorNextClosed) {
+            // Check if we have at least 1 key
+            if (key > 0) {
+                // Decrement the key count
+                key--;
+
+                // Replace the closed door with an opened door
+                game.world().getGrid().set(nextPos, new DoorNextOpened(nextPos));
+                next.setModified(true);
+                game.requestSwitchLevel(game.world().currentLevel() + 1);
+            }
+        } else if (next instanceof DoorNextOpened) {
+            game.requestSwitchLevel(game.world().currentLevel() + 1);
+
+        } else if (next instanceof DoorPrevOpened) {
+            game.requestSwitchLevel(game.world().currentLevel() - 1);
+        }
+
 
         if (next != null)
             next.takenBy(this);

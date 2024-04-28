@@ -50,13 +50,20 @@ public class GameLauncherView extends BorderPane {
                 System.err.println("[TODO] Not implemented");
             }
             Game game = GameLauncher.getInstance().load(file);
+
+            // Game engine needs a game to be created
             GameEngine engine = new GameEngine(game, stage);
+
+            // Set the game engine after creating the game engine
+            game.setGameEngine(engine);
+
             engine.start();
         });
 
         defaultItem.setOnAction(e -> {
             Game game = GameLauncher.getInstance().load();
             GameEngine engine = new GameEngine(game, stage);
+            game.setGameEngine(engine);
             engine.start();
         });
 

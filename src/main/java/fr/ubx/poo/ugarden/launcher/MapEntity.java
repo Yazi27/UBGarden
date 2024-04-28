@@ -8,7 +8,9 @@ public enum MapEntity {
     Grass('G'),
     Land('L'),
     Tree('T'),
-    Hornet('K'),
+
+    Hornet('E'),
+
     Gardener('P'),
     Hedgehog('H'),
     Key('K'),
