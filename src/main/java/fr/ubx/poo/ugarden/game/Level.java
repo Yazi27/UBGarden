@@ -87,8 +87,6 @@ public class Level implements Map {
                         grass.setBonus(new Insecticide(position, grass));
                         decors.put(position, grass);
                         break;}
-
-                        /*
                     case DoorNextClosed:
                         decors.put(position, new DoorNextClosed(position));
                         break;
@@ -97,7 +95,7 @@ public class Level implements Map {
                         break;
                     case DoorPrevOpened:
                         decors.put(position, new DoorPrevOpened(position));
-                        break;*/
+                        break;
                     default:
                         throw new RuntimeException("EntityCode " + mapEntity.name() + " not processed");
                 }

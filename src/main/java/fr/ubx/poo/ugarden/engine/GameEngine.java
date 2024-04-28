@@ -135,6 +135,7 @@
                     gardener.hurt(20);
                     frelon.remove();
                     hornets.remove(i);
+                    //hornets.add();
                 }
             }
         }
