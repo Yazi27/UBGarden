@@ -27,8 +27,6 @@ public abstract class Decor extends GameObject implements Walkable, Takeable {
         this.hornet=hornet;
     }
 
-
-
     public Bonus getBonus() {
         return bonus;
     }

@@ -10,6 +10,7 @@
     import fr.ubx.poo.ugarden.go.GameObject;
     import fr.ubx.poo.ugarden.go.bonus.Insecticide;
     import fr.ubx.poo.ugarden.go.bonus.Nest;
+    import fr.ubx.poo.ugarden.go.decor.Decor;
     import fr.ubx.poo.ugarden.go.decor.ground.Grass;
     import fr.ubx.poo.ugarden.go.decor.ground.Land;
     import fr.ubx.poo.ugarden.go.personage.Gardener;
@@ -43,8 +44,9 @@
         private final Pane layer = new Pane();
         private StatusBar statusBar;
         private Input input;
-        private Timer nestTimer;
+        private final Timer nestTimer;
         private Position nestPosition;
+        private Insecticide lastInsecticide;
         private static final Random randomGenerator = new Random();
 
 
@@ -187,6 +189,21 @@
             }.start();
         }
 
+        private Position generateValidPosition() {
+            int x, y;
+            Position position;
+            Decor decorAtPosition;
+
+            do {
+                x = randomGenerator.nextInt(game.world().getGrid().width());
+                y = randomGenerator.nextInt(game.world().getGrid().height());
+                position = new Position(game.world().currentLevel(), x, y);
+                decorAtPosition = game.world().getGrid().get(position);
+            } while (!(decorAtPosition instanceof Grass) || decorAtPosition.getBonus() != null);
+
+            return position;
+        }
+
         private void update(long now) {
             game.world().getGrid().values().forEach(decor -> decor.update(now));
 
@@ -214,29 +231,37 @@
                 sprites.add(SpriteFactory.create(layer, hornet));
                 hornets.add(hornet);
 
-                // Spawn insecticide at random location
-
-                // First we prepare a random location
-                // Create a random number from 0 to grid.width
-                int x = randomGenerator.nextInt(game.world().getGrid().width());
-                // Create a random number from 0 to grid.height
-                int y = randomGenerator.nextInt(game.world().getGrid().height());
-
-                Position position = new Position(game.world().currentLevel(), x, y);
-
-                // Check if its land
-                while (!(game.world().getGrid().get(position) instanceof Grass)) {
-                    // If its not land, then we need to find a new random location
-                    x = randomGenerator.nextInt(game.world().getGrid().width());
-                    y = randomGenerator.nextInt(game.world().getGrid().height());
-                    position = new Position(game.world().currentLevel(), x, y);
+                // Remove last insecticide from the map if its present
+                if (lastInsecticide != null) {
+                    Decor lastInsecticideDecor = game.world().getGrid().get(lastInsecticide.getPosition());
+                    // Make sure we don't remove another bonus
+                    if (lastInsecticideDecor.getBonus() instanceof Insecticide) {
+                        lastInsecticideDecor.setBonus(null);
+                        lastInsecticide.remove();
+                    }
                 }
 
+                /* ************ Spawn insecticide at random location ******** */
+
+                // First we prepare a random location
+                Position position = generateValidPosition();
+                Decor decorAtPosition = game.world().getGrid().get(position);
+
+                // Create a new Insecticide object at position
                 Insecticide insecticide = new Insecticide(position, game.world().getGrid().get(position));
-                // Place in world
+
+                // Save the last insecticide
+                lastInsecticide = insecticide;
+
+                // Set the Insecticide as the Bonus of the Decor object
+                decorAtPosition.setBonus(insecticide);
+
+                // Place sprite in world
                 sprites.add(SpriteFactory.create(layer, insecticide));
 
-                game.world().getGrid().set(position, insecticide.getDecor());
+                insecticide.setModified(true);
+
+                // Now the Insecticide is placed in the Map as a Bonus of the Decor object at the specified position
 
                 insecticide.setModified(true);
                 System.out.println("Insecticide spawned at");

@@ -33,7 +33,7 @@ public class Gardener extends GameObject implements Movable, TakeVisitor, WalkVi
     private boolean takenAppleRequested = false;
     private Timer recoveryTimer;
     private Timer diseaseTimer;
-    private int inscticide;
+    private int insecticide;
     public Gardener(Game game, Position position) {
 
         super(game, position);
@@ -44,7 +44,7 @@ public class Gardener extends GameObject implements Movable, TakeVisitor, WalkVi
         this.hedgehog=0;
         this.recoveryTimer = new Timer(game.configuration().energyRecoverDuration());
         this.diseaseTimer = new Timer (game.configuration().diseaseDuration());
-        this.inscticide=0;
+        this.insecticide=0;
     }
 
     public void startRecoveryTimer(long now) {
@@ -93,11 +93,11 @@ public class Gardener extends GameObject implements Movable, TakeVisitor, WalkVi
 
     public void take(Insecticide insecticide){
         System.out.println("de quoi tuer un frelon");
-        this.inscticide+=1;
+        this.insecticide+=1;
     }
 
-    public int getInscticide() {
-        return inscticide;
+    public int getInsecticide() {
+        return insecticide;
     }
 
     public int getEnergy() {
@@ -115,14 +115,11 @@ public class Gardener extends GameObject implements Movable, TakeVisitor, WalkVi
 @Override
     public final boolean canMove(Direction direction) {
         Position nextPos = direction.nextPosition(getPosition());
-        boolean can =
-                ((-1< nextPos.x())&&(nextPos.x() < game.world().getGrid().width())
-                ) &&
-                ((-1< nextPos.y())&& (nextPos.y() < game.world().getGrid().height())
-                ) &&
-                (game.world().getGrid().get(nextPos).walkableBy(this));
-        System.out.println(can);
-        return can;
+    return ((-1< nextPos.x())&&(nextPos.x() < game.world().getGrid().width())
+        ) &&
+        ((-1< nextPos.y())&& (nextPos.y() < game.world().getGrid().height())
+        ) &&
+        (game.world().getGrid().get(nextPos).walkableBy(this));
     }
 
     @Override
@@ -187,8 +184,8 @@ public class Gardener extends GameObject implements Movable, TakeVisitor, WalkVi
     }
 
     public void hurt(int damage) {
-        if(this.inscticide>0){
-            this.inscticide-=1;
+        if(this.insecticide>0){
+            this.insecticide-=1;
         }
         else
             this.energy-=damage;

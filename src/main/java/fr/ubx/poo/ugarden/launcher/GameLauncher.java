@@ -3,7 +3,10 @@ package fr.ubx.poo.ugarden.launcher;
 import fr.ubx.poo.ugarden.game.*;
 
 import java.io.File;
+import java.io.FileReader;
+import java.io.Reader;
 import java.util.Properties;
+import java.io.IOException;
 
 public class GameLauncher {
 
@@ -38,7 +41,119 @@ public class GameLauncher {
     }
 
     public Game load(File file) {
-        return null;
+        Properties properties = new Properties();
+
+        try (Reader reader = new FileReader(file)) {
+            properties.load(reader);
+        } catch (IOException e) {
+            throw new RuntimeException("Probleme pour lire" + file, e);
+        }
+
+        boolean compression = booleanProperty(properties, "compression", false);
+        int levels = integerProperty(properties, "levels", 1);
+
+        System.out.println("Compression: " + compression);
+        System.out.println("Number of levels: " + levels);
+
+        World world = new World(levels);
+        Configuration configuration = getConfiguration(properties);
+
+        System.out.println("Configuration: " + configuration);
+
+        Position gardenerPosition = null;
+
+        Game game = new Game(world, configuration, null);
+
+        for (int i = 1; i <= levels; i++) {
+            String levelStage = "level" + i;
+            String levelData = properties.getProperty(levelStage);
+
+            System.out.println("Loading level " + i);
+            System.out.println("Level data: " + levelData);
+
+            MapLevel mapLevel;
+            if (compression) {
+                System.out.println("Decompressing level data...");
+                mapLevel = loadCompressedLevel(levelData);
+            } else {
+                System.out.println("Loading uncompressed level data...");
+                mapLevel = loadUncompressedLevel(levelData);
+            }
+
+            System.out.println("MapLevel created for level " + i);
+            System.out.println("MapLevel dimensions: " + mapLevel.width() + "x" + mapLevel.height());
+
+            if (i == 1) {
+                gardenerPosition = mapLevel.getGardenerPosition();
+                game.getGardener().setPosition(gardenerPosition);
+                System.out.println("Gardener position: " + gardenerPosition);
+            }
+
+            Map level = new Level(game, i, mapLevel);
+            world.put(i, level);
+
+            System.out.println("Level " + i + " added to the world");
+        }
+
+        System.out.println("Game created with gardener position: " + gardenerPosition);
+
+        return game;
+    }
+
+    private MapLevel loadCompressedLevel(String levelData) {
+        String decompressedData = decompressLevel(levelData);
+        return createMapLevel(decompressedData);
+    }
+
+    private MapLevel loadUncompressedLevel(String levelData) {
+        return createMapLevel(levelData);
+    }
+
+    private String decompressLevel(String input) {
+        StringBuilder output = new StringBuilder();
+
+        for (String part : input.split("x")) {
+            StringBuilder partBuilder = new StringBuilder();
+
+            for (int i = 0; i < part.length(); i++) {
+                char chr = part.charAt(i);
+
+                if (Character.isDigit(chr)) {
+                    int count = Character.getNumericValue(chr);
+                    char prevChar = partBuilder.charAt(partBuilder.length() - 1);
+
+                    for (int j = 1; j < count; j++) {
+                        partBuilder.append(prevChar);
+                    }
+                } else {
+                    partBuilder.append(chr);
+                }
+            }
+
+            output.append(partBuilder);
+            output.append("x");
+        }
+
+        return output.toString();
+    }
+
+    private MapLevel createMapLevel(String levelData) {
+        String[] rows = levelData.split("x");
+        int height = rows.length;
+        int width = rows[0].length();
+
+        MapLevel mapLevel = new MapLevel(width, height);
+
+        for (int j = 0; j < height; j++) {
+            String row = rows[j];
+            for (int i = 0; i < width; i++) {
+                char chr = row.charAt(i);
+                MapEntity entity = MapEntity.fromCode(chr);
+                mapLevel.set(i, j, entity);
+            }
+        }
+
+        return mapLevel;
     }
 
     public Game load() {

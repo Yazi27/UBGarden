@@ -10,8 +10,6 @@ public class MapLevel {
     private final int width;
     private final int height;
     private final MapEntity[][] grid;
-
-
     private Position gardenerPosition = null;
 
     public MapLevel(int width, int height) {
