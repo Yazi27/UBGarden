@@ -56,7 +56,7 @@
             this.stage = stage;
             this.game = game;
             this.gardener = game.getGardener();
-            this.nestTimer =new Timer(5);
+            this.nestTimer =new Timer(7);
             initialize();
             buildAndSetGameLoop();
         }
