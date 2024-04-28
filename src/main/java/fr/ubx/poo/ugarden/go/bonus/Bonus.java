@@ -27,4 +27,8 @@ public abstract class Bonus extends GameObject implements Takeable {
 
     public void takenBy(Hornet hornet) {
     }
+
+    public Decor getDecor() {
+        return decor;
+    }
 }

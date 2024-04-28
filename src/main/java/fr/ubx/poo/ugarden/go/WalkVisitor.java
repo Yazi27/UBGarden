@@ -11,9 +11,6 @@ public interface WalkVisitor {
     }
 
     default boolean canWalkOn(Tree tree) {
-        /*
-        *ca devra etre un truc du genre si c'est le frelon alors sinon alors
-        */
         return false;
     }
     default boolean canWalkOn(Flowers flowers) {

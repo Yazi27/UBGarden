@@ -28,6 +28,7 @@ public abstract class Decor extends GameObject implements Walkable, Takeable {
     }
 
 
+
     public Bonus getBonus() {
         return bonus;
     }

@@ -62,7 +62,6 @@ public class Hornet extends GameObject implements Movable, TakeVisitor, WalkVisi
         // Si on veux bouger
         if (moveRequested) {
             if (canMove(direction)) {
-                System.out.println("Hornet can move and will move");
 
                 doMove(direction);
 
@@ -75,7 +74,6 @@ public class Hornet extends GameObject implements Movable, TakeVisitor, WalkVisi
         } else {
             if (!moveTimer.isRunning()) {
                 requestMove(Direction.random());
-                System.out.println("Requested random move for hornet");
             }
         }
 

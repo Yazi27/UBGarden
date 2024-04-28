@@ -16,6 +16,7 @@ public class Insecticide extends Bonus{
     @Override
     public void takenBy(Gardener gardener) {
         gardener.take(this);
+        System.out.println("Gardener took insecticide");
         remove();
     }
 }
